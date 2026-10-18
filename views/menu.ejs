@@ -1,0 +1,25 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu - Clavier d'Or</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <h1>Bienvenue, <%= utilisateur.nom %></h1>
+
+  <p>Rôle : <%= utilisateur.role %></p>
+
+  <ul>
+    <li>Nouvelle partie (à venir)</li>
+    <li>Reprendre une partie (à venir)</li>
+    <li>Historique et scores (à venir)</li>
+  </ul>
+
+  <form action="/deconnexion" method="POST">
+    <button type="submit">Se déconnecter</button>
+  </form>
+</body>
+</html>
