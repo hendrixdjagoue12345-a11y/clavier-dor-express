@@ -1,0 +1,1 @@
+// Récupère les catégories, les questions et les réponses depuis MySQL.
