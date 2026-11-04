@@ -1,0 +1,1 @@
+// Prépare les données nécessaires à l'affichage du menu

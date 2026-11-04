@@ -1,0 +1,1 @@
+// Définit les routes pour démarrer une partie, répondre et consulter les résultats.

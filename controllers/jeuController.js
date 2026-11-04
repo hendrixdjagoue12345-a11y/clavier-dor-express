@@ -1,0 +1,1 @@
+// Gère le déroulement d'une partie, les réponses et les résultats.
