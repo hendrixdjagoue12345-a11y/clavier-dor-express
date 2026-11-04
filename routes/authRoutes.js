@@ -1,3 +1,5 @@
+// Définit les routes d'inscription, de connexion et de déconnexion.
+
 const express = require('express');
 const router = express.Router();
 

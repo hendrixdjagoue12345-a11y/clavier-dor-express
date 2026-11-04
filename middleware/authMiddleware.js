@@ -1,0 +1,1 @@
+// Vérifie qu'un utilisateur est connecté avant d'accéder aux pages protégées.

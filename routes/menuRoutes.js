@@ -1,0 +1,1 @@
+// Définit les routes du menu et des pages associées.
