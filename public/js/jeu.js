@@ -1,0 +1,1 @@
+// Gère les interactions côté navigateur pour la version web.
