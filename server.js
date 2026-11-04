@@ -1,3 +1,4 @@
+// démarre le serveur Express et branche les routes.
 
 require('dotenv').config();
 
