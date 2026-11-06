@@ -1,5 +1,5 @@
 // Contrôleur d'authentification : inscription, connexion, déconnexion
-const pool = require('../config/db');
+const pool = require('../backend/config/db');
 const bcrypt = require('bcrypt');
 
 // Affiche le formulaire d'inscription
