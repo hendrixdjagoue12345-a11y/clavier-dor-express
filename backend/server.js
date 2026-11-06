@@ -1,3 +1,5 @@
+// importe app.js et démarre simplement le serveur avec app.listen()
+
 // démarre le serveur Express et branche les routes.
 
 require('dotenv').config();
