@@ -1,19 +1,22 @@
-// Définit les routes d'inscription, de connexion et de déconnexion.
 
 const express = require('express');
 const router = express.Router();
 
-const authController = require('../backend/controllers/authController');
+const authController = require('../../controllers/web/authController');
 
-// Inscription
+// Afficher le formulaire d'inscription
 router.get('/inscription', authController.afficherFormulaireInscription);
+
+// Traiter l'inscription
 router.post('/inscription', authController.inscrire);
 
-// Connexion
+// Afficher le formulaire de connexion
 router.get('/connexion', authController.afficherFormulaireConnexion);
+
+// Traiter la connexion
 router.post('/connexion', authController.connecter);
 
-// Déconnexion
+// Déconnecter l'utilisateur
 router.post('/deconnexion', authController.deconnecter);
 
 module.exports = router;
