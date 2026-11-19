@@ -108,7 +108,7 @@ exports.connecter = async (req, res, next) => {
   }
 };
 
-// Renouveler l'Access Token
+// Renouveler les tokens
 exports.renouveler = async (req, res) => {
   const refreshToken = req.cookies?.refreshToken;
 
@@ -119,13 +119,20 @@ exports.renouveler = async (req, res) => {
   }
 
   try {
-    // Vérifier le Refresh Token et générer un nouvel Access Token
-    const { accessToken } = await authService.renouveler(refreshToken);
+    // Vérifier l'ancien Refresh Token et effectuer sa rotation
+    const { accessToken, refreshToken: nouveauRefreshToken } =
+      await authService.renouveler(refreshToken);
 
     // Remplacer le cookie Access Token
     res.cookie('accessToken', accessToken, {
       ...optionsCookies,
       maxAge: 30 * 60 * 1000,
+    });
+
+    // Remplacer également le cookie Refresh Token
+    res.cookie('refreshToken', nouveauRefreshToken, {
+      ...optionsCookies,
+      maxAge: 60 * 60 * 1000,
     });
 
     return res.redirect('/menu');
@@ -139,9 +146,19 @@ exports.renouveler = async (req, res) => {
 };
 
 // Déconnecter l'utilisateur
-exports.deconnecter = (req, res) => {
-  res.clearCookie('accessToken', optionsCookies);
-  res.clearCookie('refreshToken', optionsCookies);
+exports.deconnecter = async (req, res, next) => {
+  const refreshToken = req.cookies?.refreshToken;
 
-  return res.redirect('/connexion');
+  try {
+    // Révoquer le Refresh Token dans la base de données
+    await authService.deconnecter(refreshToken);
+
+    // Supprimer les cookies du navigateur
+    res.clearCookie('accessToken', optionsCookies);
+    res.clearCookie('refreshToken', optionsCookies);
+
+    return res.redirect('/connexion');
+  } catch (erreur) {
+    return next(erreur);
+  }
 };
