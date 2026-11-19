@@ -1,1 +1,22 @@
-// Affiche le menu du jeu et les catégories disponibles.
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clavier d'Or - Menu</title>
+</head>
+<body>
+  <h1>Bienvenue sur Clavier d'Or</h1>
+
+  <p>
+    Bonjour <%= utilisateur.nom %> !
+  </p>
+
+  <p>Bienvenue dans ton espace joueur.</p>
+
+  <form action="/deconnexion" method="POST">
+    <button type="submit">Se déconnecter</button>
+  </form>
+</body>
+</html>
