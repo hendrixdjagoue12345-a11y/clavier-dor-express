@@ -1,9 +1,19 @@
 
 const bcrypt = require('bcrypt');
+const crypto = require('crypto');
 
 const utilisateurModel = require('../models/utilisateurModel');
 const roleModel = require('../models/roleModel');
+const refreshTokenModel = require('../models/refreshTokenModel');
 const tokenService = require('./tokenService');
+
+// Calculer le hash SHA-256 d'un Refresh Token
+const calculerHashToken = (token) => {
+  return crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+};
 
 // Inscrire un nouvel utilisateur
 const inscrire = async (nom, email, motDePasse) => {
@@ -31,7 +41,7 @@ const inscrire = async (nom, email, motDePasse) => {
   );
 };
 
-// Connecter un utilisateur et générer ses tokens
+// Connecter un utilisateur et générer ses tokens et enregistre uniquement le hash du Refresh Token.
 const connecter = async (email, motDePasse) => {
   const utilisateur = await utilisateurModel.trouverParEmail(email);
 
@@ -52,8 +62,26 @@ const connecter = async (email, motDePasse) => {
     role: utilisateur.role,
   };
 
+  // Générer les tokens
   const accessToken = tokenService.genererAccessToken(utilisateurConnecte);
   const refreshToken = tokenService.genererRefreshToken(utilisateurConnecte);
+
+  // Créer une famille de Refresh Tokens
+  const familleId = crypto.randomUUID();
+
+  // Hasher le Refresh Token avant son stockage
+  const tokenHash = calculerHashToken(refreshToken);
+
+  // Définir sa date d'expiration
+  const dateExpiration = new Date(Date.now() + 60 * 60 * 1000);
+
+  // Enregistrer le Refresh Token dans la base de données
+  await refreshTokenModel.creer(
+    utilisateurConnecte.id,
+    tokenHash,
+    familleId,
+    dateExpiration
+  );
 
   return {
     utilisateur: utilisateurConnecte,
@@ -62,14 +90,42 @@ const connecter = async (email, motDePasse) => {
   };
 };
 
-
-// Renouveler l'Access Token à partir du Refresh Token
+// Renouveler les tokens à partir d'un Refresh Token
 const renouveler = async (refreshToken) => {
-  // Vérifier le Refresh Token
+  // Vérifier la signature, le type et l'expiration du JWT
   const donnees = tokenService.verifierRefreshToken(refreshToken);
 
-  // Retrouver l'utilisateur dans la base de données
-  const utilisateur = await utilisateurModel.trouverParId(donnees.id);
+  // Calculer le hash de l'ancien Refresh Token
+  const ancienTokenHash = calculerHashToken(refreshToken);
+
+  // Générer le nouveau Refresh Token
+  const nouveauRefreshToken = tokenService.genererRefreshToken({
+    id: donnees.id,
+  });
+
+  const nouveauTokenHash = calculerHashToken(nouveauRefreshToken);
+
+  const nouvelleDateExpiration = new Date(
+    Date.now() + 60 * 60 * 1000
+  );
+
+  // Effectuer la rotation dans une transaction SQL
+  const resultat = await refreshTokenModel.rotater(
+    ancienTokenHash,
+    nouveauTokenHash,
+    nouvelleDateExpiration
+  );
+
+  if (resultat.statut !== 'renouvele') {
+    const erreur = new Error('Impossible de renouveler le Refresh Token.');
+    erreur.code = resultat.statut.toUpperCase();
+    throw erreur;
+  }
+
+  // Retrouver les informations actualisées de l'utilisateur
+  const utilisateur = await utilisateurModel.trouverParId(
+    resultat.idUtilisateur
+  );
 
   if (!utilisateur) {
     const erreur = new Error('Utilisateur introuvable.');
@@ -77,7 +133,6 @@ const renouveler = async (refreshToken) => {
     throw erreur;
   }
 
-  // Préparer les informations actualisées de l'utilisateur
   const utilisateurConnecte = {
     id: utilisateur.id_utilisateur,
     nom: utilisateur.nom,
@@ -91,12 +146,24 @@ const renouveler = async (refreshToken) => {
   return {
     utilisateur: utilisateurConnecte,
     accessToken,
+    refreshToken: nouveauRefreshToken,
   };
 };
 
+// Déconnecter un utilisateur en révoquant son Refresh Token en DB
+const deconnecter = async (refreshToken) => {
+  if (!refreshToken) {
+    return false;
+  }
+
+  const tokenHash = calculerHashToken(refreshToken);
+
+  return refreshTokenModel.revoquer(tokenHash);
+};
 
 module.exports = {
   inscrire,
   connecter,
   renouveler,
+  deconnecter,
 };
