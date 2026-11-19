@@ -16,6 +16,9 @@ router.get('/connexion', authController.afficherFormulaireConnexion);
 // Traiter la connexion
 router.post('/connexion', authController.connecter);
 
+// Renouveler l'Access Token
+router.post('/renouveler', authController.renouveler);
+
 // Déconnecter l'utilisateur
 router.post('/deconnexion', authController.deconnecter);
 
