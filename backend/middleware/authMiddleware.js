@@ -2,8 +2,8 @@
 const tokenService = require('../services/tokenService');
 const authService = require('../services/authService');
 
-// Options du cookie Access Token
-const optionsCookie = {
+// Options communes des cookies
+const optionsCookies = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'lax',
@@ -14,7 +14,7 @@ const optionsCookie = {
 const verifierAuthentification = async (req, res, next) => {
   const accessToken = req.cookies?.accessToken;
 
-  // Essayer de vérifier l'Access Token
+  // Vérifier l'Access Token
   if (accessToken) {
     try {
       const donnees = tokenService.verifierAccessToken(accessToken);
@@ -29,7 +29,7 @@ const verifierAuthentification = async (req, res, next) => {
       return next();
     } catch (erreur) {
       // Access Token invalide ou expiré.
-      // On essaie maintenant le Refresh Token.
+      // On essaie de renouveler l'authentification.
     }
   }
 
@@ -37,18 +37,26 @@ const verifierAuthentification = async (req, res, next) => {
   const refreshToken = req.cookies?.refreshToken;
 
   if (!refreshToken) {
-    res.clearCookie('accessToken', optionsCookie);
+    res.clearCookie('accessToken', optionsCookies);
+    res.clearCookie('refreshToken', optionsCookies);
+    
     return res.redirect('/connexion');
   }
 
   try {
-    // Renouveler automatiquement l'Access Token
+    // Renouveler les deux tokens
     const resultat = await authService.renouveler(refreshToken);
 
     // Enregistrer le nouvel Access Token
     res.cookie('accessToken', resultat.accessToken, {
-      ...optionsCookie,
+      ...optionsCookies,
       maxAge: 30 * 60 * 1000,
+    });
+
+    // Enregistrer le nouveau Refresh Token après rotation
+    res.cookie('refreshToken', resultat.refreshToken, {
+      ...optionsCookies,
+      maxAge: 60 * 60 * 1000,
     });
 
     // Rendre les informations disponibles pour le contrôleur
@@ -56,12 +64,9 @@ const verifierAuthentification = async (req, res, next) => {
 
     return next();
   } catch (erreur) {
-    // Refresh Token invalide ou expiré
-    res.clearCookie('accessToken', optionsCookie);
-    res.clearCookie('refreshToken', {
-      ...optionsCookie,
-      maxAge: 60 * 60 * 1000,
-    });
+    // Refresh Token invalide, expiré ou révoqué
+    res.clearCookie('accessToken', optionsCookies);
+    res.clearCookie('refreshToken', optionsCookies);
 
     return res.redirect('/connexion');
   }
