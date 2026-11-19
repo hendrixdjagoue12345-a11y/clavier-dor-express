@@ -2,7 +2,6 @@
 -- ATTENTION : ce script SUPPRIME la base clavier_dor puis la recrée.
 -- Après exécution, relancer 02_insertions.sql pour remettre les 100 questions.
 
-DROP DATABASE IF EXISTS clavier_dor;
 
 CREATE DATABASE clavier_dor
   CHARACTER SET utf8mb4
