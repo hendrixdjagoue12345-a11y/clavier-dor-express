@@ -2,6 +2,8 @@
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./config/swagger');
 
 // Charger les variables d'environnement
 require('dotenv').config({
@@ -30,6 +32,9 @@ app.use(express.json());
 
 // Lire les cookies envoyés par le navigateur
 app.use(cookieParser());
+
+// Afficher la documentation interactive des API
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Enregistrer les routes Web
 app.use('/', authRoutes);
