@@ -3,9 +3,15 @@ require('dotenv').config();
 
 const jwt = require('jsonwebtoken');
 
-// Vérifier que la clé secrète existe
-if (!process.env.JWT_SECRET) {
-  throw new Error('La variable JWT_SECRET est manquante dans le fichier .env');
+// Récupérer les clés secrètes
+const accessSecret = process.env.JWT_ACCESS_SECRET;
+const refreshSecret = process.env.JWT_REFRESH_SECRET;
+
+// Vérifier que les deux clés existent
+if (!accessSecret || !refreshSecret) {
+  throw new Error(
+    'Les variables JWT_ACCESS_SECRET et JWT_REFRESH_SECRET sont obligatoires.'
+  );
 }
 
 // Générer un Access Token valable 30 minutes
@@ -18,9 +24,10 @@ const genererAccessToken = (utilisateur) => {
       role: utilisateur.role,
       type: 'access',
     },
-    process.env.JWT_SECRET,
+    accessSecret,
     {
       expiresIn: '30m',
+      algorithm: 'HS256',
     }
   );
 };
@@ -32,16 +39,19 @@ const genererRefreshToken = (utilisateur) => {
       id: utilisateur.id,
       type: 'refresh',
     },
-    process.env.JWT_SECRET,
+    refreshSecret,
     {
       expiresIn: '1h',
+      algorithm: 'HS256',
     }
   );
 };
 
 // Vérifier un Access Token
 const verifierAccessToken = (token) => {
-  const donnees = jwt.verify(token, process.env.JWT_SECRET);
+  const donnees = jwt.verify(token, accessSecret, {
+    algorithms: ['HS256'],
+  });
 
   if (donnees.type !== 'access') {
     throw new Error('Type de token invalide.');
@@ -52,7 +62,9 @@ const verifierAccessToken = (token) => {
 
 // Vérifier un Refresh Token
 const verifierRefreshToken = (token) => {
-  const donnees = jwt.verify(token, process.env.JWT_SECRET);
+  const donnees = jwt.verify(token, refreshSecret, {
+    algorithms: ['HS256'],
+  });
 
   if (donnees.type !== 'refresh') {
     throw new Error('Type de token invalide.');
