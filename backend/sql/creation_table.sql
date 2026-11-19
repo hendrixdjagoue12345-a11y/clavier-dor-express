@@ -1,8 +1,3 @@
--- Clavier d'Or : schéma de la base de données, aligné sur le MCD v2
--- ATTENTION : ce script SUPPRIME la base clavier_dor puis la recrée.
--- Après exécution, relancer 02_insertions.sql pour remettre les 100 questions.
-
-
 CREATE DATABASE clavier_dor
   CHARACTER SET utf8mb4
   COLLATE utf8mb4_unicode_ci;
