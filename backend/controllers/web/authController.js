@@ -1,92 +1,147 @@
-// Contrôleur d'authentification : inscription, connexion, déconnexion
-const pool = require('../backend/config/db');
-const bcrypt = require('bcrypt');
 
-// Affiche le formulaire d'inscription
+const authService = require('../../services/authService');
+
+// Options communes des cookies
+const optionsCookies = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
+  sameSite: 'lax',
+  path: '/',
+};
+
+// Afficher le formulaire d'inscription
 exports.afficherFormulaireInscription = (req, res) => {
-  res.render('inscription');
-};
-
-// Crée un nouveau compte avec le rôle "Joueur"
-exports.inscrire = async (req, res) => {
-  const { nom, email, mot_de_passe } = req.body;
-
-  if (!nom || !email || !mot_de_passe) {
-    return res.status(400).send('Tous les champs sont obligatoires');
-  }
-
-  try {
-    // L'email doit être unique
-    const [existants] = await pool.query(
-      'SELECT id_utilisateur FROM utilisateur WHERE email = ?',
-      [email]
-    );
-    if (existants.length > 0) {
-      return res.status(400).send('Cet email est déjà utilisé');
-    }
-
-    // Le mot de passe est haché, jamais stocké en clair
-    const hash = await bcrypt.hash(mot_de_passe, 10);
-
-    await pool.query(
-      `INSERT INTO utilisateur (nom, email, mot_de_passe, id_role)
-       VALUES (?, ?, ?, (SELECT id_role FROM role WHERE libelle = 'Joueur'))`,
-      [nom, email, hash]
-    );
-
-    res.redirect('/connexion');
-  } catch (erreur) {
-    console.error(erreur);
-    res.status(500).send("Erreur lors de l'inscription");
-  }
-};
-
-// Affiche le formulaire de connexion
-exports.afficherFormulaireConnexion = (req, res) => {
-  res.render('connexion');
-};
-
-// Vérifie l'email et le mot de passe, puis ouvre la session
-exports.connecter = async (req, res) => {
-  const { email, mot_de_passe } = req.body;
-
-  if (!email || !mot_de_passe) {
-    return res.status(400).send('Tous les champs sont obligatoires');
-  }
-
-  try {
-    const [lignes] = await pool.query(
-      `SELECT u.id_utilisateur, u.nom, u.mot_de_passe, r.libelle AS role
-       FROM utilisateur u
-       JOIN role r ON r.id_role = u.id_role
-       WHERE u.email = ?`,
-      [email]
-    );
-
-    const utilisateur = lignes[0];
-    const motDePasseValide =
-      utilisateur && (await bcrypt.compare(mot_de_passe, utilisateur.mot_de_passe));
-
-    // Même message dans les deux cas : on ne révèle pas si l'email existe
-    if (!motDePasseValide) {
-      return res.status(401).send('Email ou mot de passe incorrect');
-    }
-
-    req.session.utilisateur = {
-      id: utilisateur.id_utilisateur,
-      nom: utilisateur.nom,
-      role: utilisateur.role,
-    };
-    res.redirect('/menu');
-  } catch (erreur) {
-    console.error(erreur);
-    res.status(500).send('Erreur lors de la connexion');
-  }
-};
-
-// Détruit la session et renvoie vers l'accueil
-exports.deconnecter = (req, res) => {
-  req.session.destroy(() => {
-    res.redirect('/');
+  res.render('auth/inscription', {
+    erreur: null,
+    nom: '',
+    email: '',
   });
+};
+
+// Traiter l'inscription
+exports.inscrire = async (req, res, next) => {
+  const nom = req.body.nom?.trim();
+  const email = req.body.email?.trim().toLowerCase();
+  const motDePasse = req.body.mot_de_passe;
+
+  if (!nom || !email || !motDePasse) {
+    return res.status(400).render('auth/inscription', {
+      erreur: 'Tous les champs sont obligatoires.',
+      nom: nom || '',
+      email: email || '',
+    });
+  }
+
+  if (motDePasse.length < 8) {
+    return res.status(400).render('auth/inscription', {
+      erreur: 'Le mot de passe doit contenir au moins 8 caractères.',
+      nom,
+      email,
+    });
+  }
+
+  try {
+    await authService.inscrire(nom, email, motDePasse);
+    return res.redirect('/connexion');
+  } catch (erreur) {
+    if (
+      erreur.code === 'EMAIL_DEJA_UTILISE' ||
+      erreur.code === 'ER_DUP_ENTRY'
+    ) {
+      return res.status(409).render('auth/inscription', {
+        erreur: 'Cette adresse e-mail est déjà utilisée.',
+        nom,
+        email,
+      });
+    }
+
+    return next(erreur);
+  }
+};
+
+// Afficher le formulaire de connexion
+exports.afficherFormulaireConnexion = (req, res) => {
+  res.render('auth/connexion', {
+    erreur: null,
+    email: '',
+  });
+};
+
+// Traiter la connexion
+exports.connecter = async (req, res, next) => {
+  const email = req.body.email?.trim().toLowerCase();
+  const motDePasse = req.body.mot_de_passe;
+
+  if (!email || !motDePasse) {
+    return res.status(400).render('auth/connexion', {
+      erreur: 'Tous les champs sont obligatoires.',
+      email: email || '',
+    });
+  }
+
+  try {
+    // Vérifier les identifiants et récupérer les tokens
+    const { accessToken, refreshToken } =
+      await authService.connecter(email, motDePasse);
+
+    // Stocker les tokens dans des cookies HttpOnly
+    res.cookie('accessToken', accessToken, {
+      ...optionsCookies,
+      maxAge: 30 * 60 * 1000,
+    });
+
+    res.cookie('refreshToken', refreshToken, {
+      ...optionsCookies,
+      maxAge: 60 * 60 * 1000,
+    });
+
+    return res.redirect('/menu');
+  } catch (erreur) {
+    if (erreur.code === 'IDENTIFIANTS_INVALIDES') {
+      return res.status(401).render('auth/connexion', {
+        erreur: 'Adresse e-mail ou mot de passe incorrect.',
+        email,
+      });
+    }
+
+    return next(erreur);
+  }
+};
+
+// Renouveler l'Access Token
+exports.renouveler = async (req, res) => {
+  const refreshToken = req.cookies?.refreshToken;
+
+  if (!refreshToken) {
+    res.clearCookie('accessToken', optionsCookies);
+    res.clearCookie('refreshToken', optionsCookies);
+    return res.redirect('/connexion');
+  }
+
+  try {
+    // Vérifier le Refresh Token et générer un nouvel Access Token
+    const { accessToken } = await authService.renouveler(refreshToken);
+
+    // Remplacer le cookie Access Token
+    res.cookie('accessToken', accessToken, {
+      ...optionsCookies,
+      maxAge: 30 * 60 * 1000,
+    });
+
+    return res.redirect('/menu');
+  } catch (erreur) {
+    // Refresh Token invalide ou utilisateur introuvable
+    res.clearCookie('accessToken', optionsCookies);
+    res.clearCookie('refreshToken', optionsCookies);
+
+    return res.redirect('/connexion');
+  }
+};
+
+// Déconnecter l'utilisateur
+exports.deconnecter = (req, res) => {
+  res.clearCookie('accessToken', optionsCookies);
+  res.clearCookie('refreshToken', optionsCookies);
+
+  return res.redirect('/connexion');
 };
