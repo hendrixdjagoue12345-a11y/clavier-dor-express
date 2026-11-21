@@ -19,29 +19,13 @@ exports.afficherFormulaireInscription = (req, res) => {
 };
 
 // Traiter l'inscription
+
 exports.inscrire = async (req, res, next) => {
-  const nom = req.body.nom?.trim();
-  const email = req.body.email?.trim().toLowerCase();
-  const motDePasse = req.body.mot_de_passe;
-
-  if (!nom || !email || !motDePasse) {
-    return res.status(400).render('auth/inscription', {
-      erreur: 'Tous les champs sont obligatoires.',
-      nom: nom || '',
-      email: email || '',
-    });
-  }
-
-  if (motDePasse.length < 8) {
-    return res.status(400).render('auth/inscription', {
-      erreur: 'Le mot de passe doit contenir au moins 8 caractères.',
-      nom,
-      email,
-    });
-  }
+  const { nom, email, mot_de_passe: motDePasse } = req.body;
 
   try {
     await authService.inscrire(nom, email, motDePasse);
+
     return res.redirect('/connexion');
   } catch (erreur) {
     if (
@@ -58,6 +42,7 @@ exports.inscrire = async (req, res, next) => {
     return next(erreur);
   }
 };
+
 
 // Afficher le formulaire de connexion
 exports.afficherFormulaireConnexion = (req, res) => {
