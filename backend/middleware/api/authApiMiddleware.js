@@ -1,5 +1,5 @@
 
-const tokenService = require('../services/tokenService');
+const tokenService = require('../../services/tokenService');
 
 // Vérifier l'authentification d'un utilisateur de l'API mobile
 const verifierAuthentification = (req, res, next) => {
