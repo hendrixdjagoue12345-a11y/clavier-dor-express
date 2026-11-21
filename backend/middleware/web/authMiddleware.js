@@ -1,6 +1,6 @@
 
-const tokenService = require('../services/tokenService');
-const authService = require('../services/authService');
+const tokenService = require('../../services/tokenService');
+const authService = require('../../services/authService');
 
 // Options communes des cookies
 const optionsCookies = {
