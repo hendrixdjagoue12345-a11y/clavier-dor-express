@@ -14,6 +14,9 @@ require('dotenv').config({
 const authRoutes = require('./routes/web/authRoutes');
 const menuRoutes = require('./routes/web/menuRoutes');
 
+// Importer les routes API pour l'application mobile
+const authApiRoutes = require('./routes/api/authApiRoutes');
+
 // Importer le middleware de gestion des erreurs
 const errorMiddleware = require('./middleware/errorMiddleware');
 
@@ -39,6 +42,9 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Enregistrer les routes Web
 app.use('/', authRoutes);
 app.use('/', menuRoutes);
+
+// Enregistrer les routes API pour l'application mobile
+app.use('/api/auth', authApiRoutes);
 
 // Rediriger la page d'accueil vers la connexion
 app.get('/', (req, res) => {
