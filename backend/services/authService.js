@@ -33,12 +33,28 @@ const inscrire = async (nom, email, motDePasse) => {
 
   const motDePasseHache = await bcrypt.hash(motDePasse, 10);
 
-  return utilisateurModel.creer(
+  // Créer le compte et récupérer son identifiant
+  const idUtilisateur = await utilisateurModel.creer(
     nom,
     email,
     motDePasseHache,
     role.id_role
   );
+
+  // Récupérer les informations publiques du nouveau compte
+  const utilisateur = await utilisateurModel.trouverParId(idUtilisateur);
+
+  if (!utilisateur) {
+    throw new Error('Impossible de récupérer le compte créé.');
+  }
+
+  // Retourner uniquement les informations publiques
+  return {
+    id: utilisateur.id_utilisateur,
+    nom: utilisateur.nom,
+    email: utilisateur.email,
+    role: utilisateur.role,
+  };
 };
 
 // Connecter un utilisateur et générer ses tokens et enregistre uniquement le hash du Refresh Token.
