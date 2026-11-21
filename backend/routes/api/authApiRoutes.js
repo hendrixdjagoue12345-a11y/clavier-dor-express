@@ -1,5 +1,3 @@
-// contient les routes utilisées par l'application mobile.
-
 
 const express = require('express');
 const router = express.Router();
