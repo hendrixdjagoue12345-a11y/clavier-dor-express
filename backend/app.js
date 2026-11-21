@@ -16,6 +16,7 @@ const menuRoutes = require('./routes/web/menuRoutes');
 
 // Importer les routes API pour l'application mobile
 const authApiRoutes = require('./routes/api/authApiRoutes');
+const menuApiRoutes = require('./routes/api/menuApiRoutes');
 
 // Importer le middleware de gestion des erreurs
 const errorMiddleware = require('./middleware/errorMiddleware');
@@ -45,6 +46,7 @@ app.use('/', menuRoutes);
 
 // Enregistrer les routes API pour l'application mobile
 app.use('/api/auth', authApiRoutes);
+app.use('/api', menuApiRoutes);
 
 // Rediriger la page d'accueil vers la connexion
 app.get('/', (req, res) => {
