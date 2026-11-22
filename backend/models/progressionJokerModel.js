@@ -2,8 +2,8 @@
 const pool = require('../config/db');
 
 // Initialiser les jokers d'une progression
-const initialiser = async (idProgression) => {
-  const [resultat] = await pool.query(
+const initialiser = async (idProgression, connexion = pool) => {
+  const [resultat] = await connexion.query(
     `INSERT INTO progression_joker
       (id_progression, id_joker)
      SELECT ?, id_joker
