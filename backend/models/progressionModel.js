@@ -2,8 +2,8 @@
 const pool = require('../config/db');
 
 // Créer une progression pour une catégorie dans une partie
-const creer = async (idPartie, idCategorie) => {
-  const [resultat] = await pool.query(
+const creer = async (idPartie, idCategorie, connexion = pool) => {
+  const [resultat] = await connexion.query(
     `INSERT INTO progression (id_partie, id_categorie)
      VALUES (?, ?)`,
     [idPartie, idCategorie]
