@@ -1,0 +1,86 @@
+
+
+/* Configuration générale */
+body {
+    min-height: 100vh;
+    background-color: var(--color-background);
+    color: var(--color-text);
+    font-family: var(--font-family);
+    font-size: var(--font-size-md);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Conteneur principal */
+.container {
+    width: min(100% - 2rem, var(--container-width));
+    margin-inline: auto;
+}
+
+/* Titres */
+h1,
+h2,
+h3,
+h4 {
+    color: var(--color-text);
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+h1 {
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+h2 {
+    font-size: clamp(1.4rem, 3vw, 2rem);
+}
+
+h3 {
+    font-size: 1.25rem;
+}
+
+/* Paragraphes */
+p {
+    color: var(--color-text-secondary);
+}
+
+/* Liens */
+a {
+    transition: color var(--transition-fast);
+}
+
+a:hover {
+    color: var(--color-primary);
+}
+
+/* Sélection du texte */
+::selection {
+    background-color: var(--color-primary);
+    color: var(--color-background);
+}
+
+/* Focus clavier accessible */
+:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+}
+
+/* Masquer visuellement un élément tout en le gardant accessible */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Respecter les petits écrans */
+@media (max-width: 480px) {
+    .container {
+        width: min(100% - 1.5rem, var(--container-width));
+    }
+}
