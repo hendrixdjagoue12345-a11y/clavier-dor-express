@@ -1,0 +1,48 @@
+
+:root {
+    /* Couleurs */
+    --color-background: #14130F;
+    --color-surface: #1F1D17;
+    --color-primary: #EF9F27;
+    --color-primary-hover: #D98A16;
+    --color-text: #F1EFE8;
+    --color-text-secondary: #B4B2A9;
+    --color-text-muted: #888780;
+    --color-success: #97C459;
+    --color-error: #E45B5B;
+    --color-border: #3A372D;
+
+    /* Typographie */
+    --font-family: Arial, Helvetica, sans-serif;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-md: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.5rem;
+    --font-size-2xl: 2rem;
+
+    /* Espacements */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+
+    /* Arrondis */
+    --radius-sm: 0.5rem;
+    --radius-md: 0.75rem;
+    --radius-lg: 1.125rem;
+    --radius-xl: 1.5rem;
+    --radius-full: 999px;
+
+    /* Bordures et ombres */
+    --border-width: 1px;
+    --shadow-card: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.2);
+
+    /* Conteneurs */
+    --container-width: 75rem;
+
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+}
