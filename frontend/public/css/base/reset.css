@@ -1,0 +1,91 @@
+
+/* Uniformiser le calcul des dimensions */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* Supprimer les marges et espacements par défaut */
+* {
+    margin: 0;
+    padding: 0;
+}
+
+/* Configuration générale du document */
+html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+}
+
+/* Éviter les débordements horizontaux */
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+}
+
+/* Les images ne dépassent pas leur conteneur */
+img,
+picture,
+video,
+canvas,
+svg {
+    display: block;
+    max-width: 100%;
+}
+
+/* Uniformiser les éléments de formulaire */
+button,
+input,
+textarea,
+select {
+    font: inherit;
+}
+
+/* Les boutons sont cliquables */
+button {
+    cursor: pointer;
+}
+
+/* Supprimer les styles par défaut des liens */
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Uniformiser les listes */
+ul,
+ol {
+    list-style: none;
+}
+
+/* Éviter les débordements de texte */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+    overflow-wrap: break-word;
+}
+
+/* Améliorer le rendu des champs */
+input,
+textarea,
+select {
+    min-width: 0;
+}
+
+/* Respecter les préférences de réduction des animations */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        scroll-behavior: auto !important;
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
