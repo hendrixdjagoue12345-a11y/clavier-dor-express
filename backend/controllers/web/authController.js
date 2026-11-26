@@ -12,6 +12,8 @@ const optionsCookies = {
 // Afficher le formulaire d'inscription
 exports.afficherFormulaireInscription = (req, res) => {
   res.render('auth/inscription', {
+    titre: "Inscription - Clavier d'Or",
+    fichierCss: '/css/pages/auth.css',
     erreur: null,
     nom: '',
     email: '',
@@ -33,6 +35,8 @@ exports.inscrire = async (req, res, next) => {
       erreur.code === 'ER_DUP_ENTRY'
     ) {
       return res.status(409).render('auth/inscription', {
+        titre: "Inscription - Clavier d'Or",
+        fichierCss: '/css/pages/auth.css',
         erreur: 'Cette adresse e-mail est déjà utilisée.',
         nom,
         email,
@@ -47,6 +51,8 @@ exports.inscrire = async (req, res, next) => {
 // Afficher le formulaire de connexion
 exports.afficherFormulaireConnexion = (req, res) => {
   res.render('auth/connexion', {
+    titre: "Connexion - Clavier d'Or",
+    fichierCss: '/css/pages/auth.css',
     erreur: null,
     email: '',
   });
@@ -59,6 +65,8 @@ exports.connecter = async (req, res, next) => {
 
   if (!email || !motDePasse) {
     return res.status(400).render('auth/connexion', {
+      titre: "Connexion - Clavier d'Or",
+      fichierCss: '/css/pages/auth.css',
       erreur: 'Tous les champs sont obligatoires.',
       email: email || '',
     });
@@ -84,6 +92,8 @@ exports.connecter = async (req, res, next) => {
   } catch (erreur) {
     if (erreur.code === 'IDENTIFIANTS_INVALIDES') {
       return res.status(401).render('auth/connexion', {
+        titre: "Connexion - Clavier d'Or",
+        fichierCss: '/css/pages/auth.css',
         erreur: 'Adresse e-mail ou mot de passe incorrect.',
         email,
       });
