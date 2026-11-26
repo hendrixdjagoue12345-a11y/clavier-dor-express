@@ -1,52 +1,73 @@
-//  Affiche le formulaire de connexion.
 
+<%# Affiche le formulaire de connexion. %>
 
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connexion - Clavier d'Or</title>
-    <link rel="stylesheet" href="/css/styles.css">
-</head>
-<body>
+<main class="auth-page">
+    <div class="auth-container">
 
-    <main>
-        <h1>Connexion</h1>
+        <div class="auth-brand">
+            <img src="/images/logo.png" alt="Logo Clavier d'Or">
+            <h1>Clavier d'Or</h1>
+            <p>Entraîne ton esprit, maîtrise tes connaissances.</p>
+        </div>
 
-        <% if (erreur) { %>
-            <p role="alert"><%= erreur %></p>
-        <% } %>
-
-        <form action="/connexion" method="POST">
-            <div>
-                <label for="email">Adresse e-mail</label>
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value="<%= email %>"
-                    required
-                >
+        <section class="card auth-card">
+            <div class="auth-card-header">
+                <h2>Connexion</h2>
+                <p>Connecte-toi pour continuer ton aventure.</p>
             </div>
 
-            <div>
-                <label for="mot_de_passe">Mot de passe</label>
-                <input
-                    type="password"
-                    id="mot_de_passe"
-                    name="mot_de_passe"
-                    required
-                >
-            </div>
+            <% if (erreur) { %>
+                <p class="form-error" role="alert">
+                    <%= erreur %>
+                </p>
+            <% } %>
 
-            <button type="submit">Se connecter</button>
-        </form>
+            <form action="/connexion" method="POST" class="form">
 
-        <p>Pas encore de compte ?
+                <div class="form-group">
+                    <label for="email" class="form-label">
+                        Adresse e-mail
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="form-input"
+                        value="<%= email %>"
+                        placeholder="exemple@email.com"
+                        autocomplete="email"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="mot_de_passe" class="form-label">
+                        Mot de passe
+                    </label>
+
+                    <input
+                        type="password"
+                        id="mot_de_passe"
+                        name="mot_de_passe"
+                        class="form-input"
+                        placeholder="Ton mot de passe"
+                        autocomplete="current-password"
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">
+                    Se connecter
+                </button>
+
+            </form>
+        </section>
+
+        <p class="auth-footer">
+            Pas encore de compte ?
             <a href="/inscription">Créer un compte</a>
         </p>
-    </main>
 
-</body>
-</html>
+    </div>
+</main>
