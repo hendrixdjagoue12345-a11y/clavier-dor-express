@@ -4,6 +4,7 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./config/swagger');
+const expressLayouts = require('express-ejs-layouts');
 
 // Charger les variables d'environnement
 require('dotenv').config({
@@ -27,6 +28,10 @@ const app = express();
 // Configurer le moteur de vues EJS
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '../frontend/views'));
+
+// Configurer le layout principal
+app.set('layout', 'layouts/principal');
+app.use(expressLayouts);
 
 // Configurer les ressources statiques
 app.use(express.static(path.join(__dirname, '../frontend/public')));

@@ -1,0 +1,36 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#14130F">
+
+    <title><%= typeof titre !== 'undefined' ? titre : "Clavier d'Or" %></title>
+
+    <!-- CSS de base -->
+    <link rel="stylesheet" href="/css/base/variables.css">
+    <link rel="stylesheet" href="/css/base/reset.css">
+    <link rel="stylesheet" href="/css/base/global.css">
+
+    <!-- CSS des composants -->
+    <link rel="stylesheet" href="/css/components/buttons.css">
+    <link rel="stylesheet" href="/css/components/cards.css">
+    <link rel="stylesheet" href="/css/components/forms.css">
+
+    <!-- CSS spécifique à la page -->
+    <% if (typeof fichierCss !== 'undefined' && fichierCss) { %>
+        <link rel="stylesheet" href="<%= fichierCss %>">
+    <% } %>
+</head>
+
+<body>
+    <!-- Contenu de la vue EJS -->
+    <%- body %>
+
+    <!-- JavaScript spécifique à la page -->
+    <% if (typeof fichierJs !== 'undefined' && fichierJs) { %>
+        <script src="<%= fichierJs %>" defer></script>
+    <% } %>
+</body>
+</html>
